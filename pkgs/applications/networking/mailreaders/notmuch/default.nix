@@ -56,20 +56,20 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
   makeFlags = [ "V=1" ];
 
-  preCheck = let
-    test-database = fetchurl {
-      url = "https://notmuchmail.org/releases/test-databases/database-v1.tar.xz";
-      sha256 = "1lk91s00y4qy4pjh8638b5lfkgwyl282g1m27srsf7qfn58y16a2";
-    };
-  in ''
-    ln -s ${test-database} test/test-databases/database-v1.tar.xz
-  '';
-  doCheck = !stdenv.hostPlatform.isDarwin && (versionAtLeast gmime.version "3.0.3");
-  checkTarget = "test";
-  checkInputs = [
-    which dtach openssl bash
-    gdb man
-  ];
+  # preCheck = let
+  #   test-database = fetchurl {
+  #     url = "https://notmuchmail.org/releases/test-databases/database-v1.tar.xz";
+  #     sha256 = "1lk91s00y4qy4pjh8638b5lfkgwyl282g1m27srsf7qfn58y16a2";
+  #   };
+  # in ''
+  #   ln -s ${test-database} test/test-databases/database-v1.tar.xz
+  # '';
+  # doCheck = !stdenv.hostPlatform.isDarwin && (versionAtLeast gmime.version "3.0");
+  # checkTarget = "test";
+  # checkInputs = [
+  #   which dtach openssl bash
+  #   gdb man
+  # ];
 
   installTargets = [ "install" "install-man" ];
 
