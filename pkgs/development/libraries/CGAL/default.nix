@@ -16,6 +16,8 @@ stdenv.mkDerivation rec {
   buildInputs = [ boost gmp mpfr ];
   nativeBuildInputs = [ cmake ];
 
+  patches = [ ./cgal_path.patch ];
+
   doCheck = false;
 
   meta = with stdenv.lib; {
