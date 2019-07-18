@@ -5667,8 +5667,6 @@ in
 
   pydf = callPackage ../applications/misc/pydf { };
 
-  pygmentex = callPackage ../tools/typesetting/pygmentex { };
-
   pythonIRClib = pythonPackages.pythonIRClib;
 
   pythonSexy = pythonPackages.libsexy;
