@@ -1,5 +1,5 @@
 { stdenv, fetchurl, fetchpatch, gfortran, perl, libnl
-, rdma-core, zlib, numactl, libevent, hwloc
+, rdma-core, zlib, numactl, libevent, hwloc, pkgsTargetTarget
 
 # Enable the Sun Grid Engine bindings
 , enableSGE ? false
@@ -30,6 +30,13 @@ in stdenv.mkDerivation rec {
 
   postPatch = ''
     patchShebangs ./
+
+    # Ensure build is reproducible
+    ts=`date -d @$SOURCE_DATE_EPOCH`
+    sed -i 's/OPAL_CONFIGURE_USER=.*/OPAL_CONFIGURE_USER="nixbld"/' configure
+    sed -i 's/OPAL_CONFIGURE_HOST=.*/OPAL_CONFIGURE_HOST="localhost"/' configure
+    sed -i "s/OPAL_CONFIGURE_DATE=.*/OPAL_CONFIGURE_DATE=\"$ts\"/" configure
+    find -name "Makefile.in" -exec sed -i "s/\`date\`/$ts/" \{} \;
   '';
 
   buildInputs = with stdenv; [ gfortran zlib ]
@@ -39,7 +46,7 @@ in stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ perl ];
 
-  configureFlags = with stdenv; [ "--disable-mca-dso" ]
+  configureFlags = with stdenv; [ "--disable-mca-dso" "--enable-mpi-cxx" ]
     ++ lib.optional isLinux  "--with-libnl=${libnl.dev}"
     ++ lib.optional enableSGE "--with-sge"
     ++ lib.optional enablePrefix "--enable-mpirun-prefix-by-default"
@@ -50,6 +57,19 @@ in stdenv.mkDerivation rec {
   postInstall = ''
     rm -f $out/lib/*.la
    '';
+
+  postFixup = ''
+    # default compilers should be indentical to the
+    # compilers at build time
+    sed -i 's:compiler=.*:compiler=${pkgsTargetTarget.stdenv.cc}/bin/${pkgsTargetTarget.stdenv.cc.targetPrefix}cc:' \
+      $out/share/openmpi/mpicc-wrapper-data.txt
+    sed -i 's:compiler=.*:compiler=${pkgsTargetTarget.stdenv.cc}/bin/${pkgsTargetTarget.stdenv.cc.targetPrefix}cc:' \
+       $out/share/openmpi/ortecc-wrapper-data.txt
+    sed -i 's:compiler=.*:compiler=${pkgsTargetTarget.stdenv.cc}/bin/${pkgsTargetTarget.stdenv.cc.targetPrefix}c++:' \
+       $out/share/openmpi/mpic++-wrapper-data.txt
+    sed -i 's:compiler=.*:compiler=${pkgsTargetTarget.gfortran}/bin/${pkgsTargetTarget.gfortran.targetPrefix}gfortran:'  \
+       $out/share/openmpi/mpifort-wrapper-data.txt
+  '';
 
   doCheck = true;
 
