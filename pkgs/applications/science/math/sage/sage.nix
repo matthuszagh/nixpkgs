@@ -1,6 +1,6 @@
 { stdenv
 , makeWrapper
-, sage-tests
+# , sage-tests
 , sage-with-env
 , jupyter-kernel-definition
 , jupyter-kernel
@@ -29,7 +29,7 @@ stdenv.mkDerivation rec {
 
     # This is a hack to make sure sage-tests is evaluated. It doesn't acutally
     # produce anything of value, it just decouples the tests from the build.
-    sage-tests
+    # sage-tests
   ];
 
   dontUnpack = true;
@@ -53,8 +53,8 @@ stdenv.mkDerivation rec {
   '';
 
   passthru = {
-    tests = sage-tests;
-    quicktest = sage-tests.override { longTests = false; timeLimit = 600; }; # as many tests as possible in ~10m
+    # tests = sage-tests;
+    # quicktest = sage-tests.override { longTests = false; timeLimit = 600; }; # as many tests as possible in ~10m
     doc = sagedoc;
     lib = sage-with-env.env.lib;
     kernelspec = jupyter-kernel-definition;
