@@ -39,7 +39,7 @@ stdenv.mkDerivation rec {
   # At least, we use -fPIC for other packages to be able to use this in shared
   # objects.
   cmakeFlags = [ "-DCMAKE_C_FLAGS=-fPIC" "-DCMAKE_CXX_FLAGS=-fPIC" ]
-    ++ optional (qtLib != null) [ "-DVTK_USE_QT:BOOL=ON" ]
+    ++ optional (qtLib != null) [ "-DVTK_USE_QT:BOOL=ON" "-DModule_vtkGUISupportQt:BOOL=ON" ]
     ++ optional stdenv.isDarwin "-DOPENGL_INCLUDE_DIR=${OpenGL}/Library/Frameworks";
 
   postPatch = stdenv.lib.optionalString stdenv.isDarwin ''
