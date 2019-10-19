@@ -4,12 +4,14 @@ buildPythonPackage rec {
   pname = "cocotb";
   version = "1.2.0";
 
-  src = fetchFromGitHub {
-    owner = pname;
-    repo = pname;
-    rev = "v${version}";
-    sha256 = "091q63jcm87xggqgqi44lw2vjxhl1v4yl0mv2c76hgavb29w4w5y";
-  };
+  src = /home/matt/src/cocotb;
+
+  # src = fetchFromGitHub {
+  #   owner = pname;
+  #   repo = pname;
+  #   rev = "v${version}";
+  #   sha256 = "091q63jcm87xggqgqi44lw2vjxhl1v4yl0mv2c76hgavb29w4w5y";
+  # };
 
   propagatedBuildInputs = [
     setuptools
