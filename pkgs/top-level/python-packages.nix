@@ -966,6 +966,8 @@ in {
 
   azure-mgmt-policyinsights = callPackage ../development/python-modules/azure-mgmt-policyinsights { };
 
+  python-linux-gpib = callPackage ../development/python-modules/python-linux-gpib { };
+
   azure-mgmt-powerbiembedded = callPackage ../development/python-modules/azure-mgmt-powerbiembedded { };
 
   azure-mgmt-privatedns = callPackage ../development/python-modules/azure-mgmt-privatedns { };

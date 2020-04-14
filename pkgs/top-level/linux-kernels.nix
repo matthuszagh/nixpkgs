@@ -315,6 +315,8 @@ in {
 
     liquidtux = callPackage ../os-specific/linux/liquidtux {};
 
+    linux-gpib = callPackage ../os-specific/linux/linux-gpib/default.nix { };
+
     v4l2loopback = callPackage ../os-specific/linux/v4l2loopback { };
 
     lttng-modules = callPackage ../os-specific/linux/lttng-modules { };

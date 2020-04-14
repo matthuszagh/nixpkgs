@@ -22481,6 +22481,8 @@ with pkgs;
   linuxPackages_xanmod = linuxKernel.packages.linux_xanmod;
   linux_xanmod = linuxKernel.kernels.linux_xanmod;
 
+  linux-gpib = callPackage ../applications/science/electronics/linux-gpib { };
+
   cryptodev = linuxKernel.packages.linux_4_9.cryptodev;
 
   dpdk = callPackage ../os-specific/linux/dpdk {
