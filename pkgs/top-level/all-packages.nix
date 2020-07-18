@@ -7438,6 +7438,8 @@ in
 
   viu = callPackage ../tools/graphics/viu { };
 
+  vivado = callPackage ../applications/science/electronics/vivado { };
+
   vnc2flv = callPackage ../tools/video/vnc2flv {};
 
   vncrec = callPackage ../tools/video/vncrec { };
