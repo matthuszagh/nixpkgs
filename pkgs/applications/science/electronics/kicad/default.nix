@@ -38,7 +38,7 @@ with lib;
 let
   baseName = if (stable) then "kicad" else "kicad-unstable";
 
-  versions = import ./versions.nix;
+  versions = (import ./versions.nix) // srcs;
   versionConfig = versions.${baseName};
 
   wxGTK =
