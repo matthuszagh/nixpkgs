@@ -1,31 +1,48 @@
-{ lib, stdenv, gnome3, wxGTK30, wxGTK31
+{ lib
+, stdenv
+, gnome3
+, wxGTK30
+, wxGTK31
 , makeWrapper
-, gsettings-desktop-schemas, hicolor-icon-theme
-, callPackage, callPackages
-, librsvg, cups
+, gsettings-desktop-schemas
+, hicolor-icon-theme
+, callPackage
+, callPackages
+, librsvg
+, cups
 
 , pname ? "kicad"
 , stable ? true
-, oceSupport ? false, opencascade
-, withOCCT ? true, opencascade-occt
-, ngspiceSupport ? true, libngspice
-, scriptingSupport ? true, swig, python3
-, debug ? false, valgrind
+, oceSupport ? false
+, opencascade
+, withOCCT ? true
+, opencascade-occt
+, ngspiceSupport ? true
+, libngspice
+, scriptingSupport ? true
+, swig
+, python3
+, debug ? false
+, valgrind
 , with3d ? true
 , withI18n ? true
+, srcs ? { }
+, symbol-path ? null
+, footprint-path ? null
+, model3d-path ? null
 }:
 
 assert ngspiceSupport -> libngspice != null;
 
 with lib;
 let
-
   baseName = if (stable) then "kicad" else "kicad-unstable";
 
-  versions =  import ./versions.nix;
+  versions = import ./versions.nix;
   versionConfig = versions.${baseName};
 
-  wxGTK = if (stable)
+  wxGTK =
+    if (stable)
     # wxGTK3x may default to withGtk2 = false, see #73145
     then wxGTK30.override { withGtk2 = false; }
     # wxGTK31 currently introduces an issue with opening the python interpreter in pcbnew
@@ -59,7 +76,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ makeWrapper ]
     ++ optionals (scriptingSupport)
-      [ python.pkgs.wrapPython ];
+    [ python.pkgs.wrapPython ];
 
   # wrapGAppsHook added the equivalent to ${base}/share
   # though i noticed no difference without it
@@ -73,13 +90,16 @@ stdenv.mkDerivation rec {
     "--prefix XDG_DATA_DIRS : ${cups}/share"
     "--prefix GIO_EXTRA_MODULES : ${gnome3.dconf}/lib/gio/modules"
 
-    "--set KISYSMOD ${footprints}/share/kicad/modules"
-    "--set KICAD_SYMBOL_DIR ${symbols}/share/kicad/library"
     "--set KICAD_TEMPLATE_DIR ${templates}/share/kicad/template"
     "--prefix KICAD_TEMPLATE_DIR : ${symbols}/share/kicad/template"
     "--prefix KICAD_TEMPLATE_DIR : ${footprints}/share/kicad/template"
   ]
-  ++ optionals (with3d) [ "--set KISYS3DMOD ${packages3d}/share/kicad/modules/packages3d" ]
+  ++ (if (symbol-path != null) then [ "--set KICAD_SYMBOL_DIR ${symbol-path}" ]
+  else [ "--set KICAD_SYMBOL_DIR ${symbols}/share/kicad/library" ])
+  ++ (if (footprint-path != null) then [ "--set KISYSMOD ${footprint-path}" ]
+  else [ "--set KISYSMOD ${footprints}/share/kicad/modules" ])
+  ++ optionals (with3d) (if (model3d-path != null) then [ "--set KISYS3DMOD ${model3d-path}" ]
+  else [ "--set KISYS3DMOD ${packages3d}/share/kicad/modules/packages3d" ])
   ++ optionals (ngspiceSupport) [ "--prefix LD_LIBRARY_PATH : ${libngspice}/lib" ]
 
   # infinisil's workaround for #39493
@@ -94,17 +114,19 @@ stdenv.mkDerivation rec {
       tools = [ "kicad" "pcbnew" "eeschema" "gerbview" "pcb_calculator" "pl_editor" "bitmap2component" ];
       utils = [ "dxf2idf" "idf2vrml" "idfcyl" "idfrect" "kicad2step" "kicad-ogltest" ];
     in
-    ( concatStringsSep "\n"
-      ( flatten [
-        ( optionalString (scriptingSupport) "buildPythonPath \"${base} $pythonPath\" \n" )
+    (concatStringsSep "\n"
+      (flatten [
+        (optionalString (scriptingSupport) "buildPythonPath \"${base} $pythonPath\" \n")
 
         # wrap each of the directly usable tools
-        ( map ( tool: "makeWrapper ${base}/bin/${tool} $out/bin/${tool} $makeWrapperArgs"
-          + optionalString (scriptingSupport) " --set PYTHONPATH \"$program_PYTHONPATH\""
-            ) tools )
+        (map
+          (tool: "makeWrapper ${base}/bin/${tool} $out/bin/${tool} $makeWrapperArgs"
+            + optionalString (scriptingSupport) " --set PYTHONPATH \"$program_PYTHONPATH\""
+          )
+          tools)
 
         # link in the CLI utils
-        ( map ( util: "ln -s ${base}/bin/${util} $out/bin/${util}" ) utils )
+        (map (util: "ln -s ${base}/bin/${util} $out/bin/${util}") utils)
       ])
     )
   ;
@@ -118,9 +140,9 @@ stdenv.mkDerivation rec {
 
   meta = rec {
     description = (if (stable)
-      then "Open Source Electronics Design Automation suite"
-      else "Open Source EDA suite, development build")
-      + (if (!with3d) then ", without 3D models" else "");
+    then "Open Source Electronics Design Automation suite"
+    else "Open Source EDA suite, development build")
+    + (if (!with3d) then ", without 3D models" else "");
     homepage = "https://www.kicad-pcb.org/";
     longDescription = ''
       KiCad is an open source software suite for Electronic Design Automation.
