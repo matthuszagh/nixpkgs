@@ -21,4 +21,8 @@ stdenv.mkDerivation rec {
   configurePhase = ''
     ./configure --sysconfdir=$out/etc --prefix=$out
   '';
+
+  patches = [
+    ../pkgs/linux-gpib/linux-gpib-user-4.3.3.patch
+  ];
 }
