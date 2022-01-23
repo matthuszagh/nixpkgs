@@ -22483,6 +22483,8 @@ with pkgs;
 
   linux-gpib = callPackage ../applications/science/electronics/linux-gpib { };
 
+  hpdrive = callPackage ../applications/science/electronics/hpdrive { };
+
   cryptodev = linuxKernel.packages.linux_4_9.cryptodev;
 
   dpdk = callPackage ../os-specific/linux/dpdk {
