@@ -14282,6 +14282,8 @@ self: super: with self; {
 
   pyuv = callPackage ../development/python-modules/pyuv { };
 
+  pyuvm = callPackage ../development/python-modules/pyuvm { };
+
   pyvcd = callPackage ../development/python-modules/pyvcd { };
 
   pyvera = callPackage ../development/python-modules/pyvera { };
